@@ -15,10 +15,21 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::post('login',[UserController::class,'login']);
+Route::post('logout',[UserController::class,'logout'])->middleware('auth.Token');
+
+Route::middleware(['auth.Token','role'])->group(function () {
+// Route::middleware(['auth.Token'])->group(function () {
+
+    // User Routes
+
+    // Route::post('user/add',[UserController::class,'userAdd'])->middleware('role:admin|sales');
+    Route::post('user/add',[UserController::class,'userAdd']);
+
 });
 
 
-Route::get('user',[UserController::class,'user']);
-Route::post('logout',[UserController::class,'logout']);
