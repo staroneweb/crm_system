@@ -8,7 +8,6 @@ use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Client\Events\ResponseReceived;
 use Illuminate\Validation\Rule;
@@ -16,36 +15,6 @@ use Illuminate\Support\Facades\File;
 
 class UserController extends Controller
 {
-
-
-    public function login(Request $request)
-    {
-        try {
-
-            $validator = Validator::make($request->all(), [
-
-                'email' => 'required|string|max:255',
-                'password' => 'required|string|min:8',
-            ]);
-
-            if ($validator->fails()) {
-                Log::info('Validation errors', $validator->errors()->toArray());
-                return response()->json(['status' => 500, 'message' => $validator->errors()]);
-            }
-
-            if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                return response()->json(['status' => 500, 'message' => 'Invalid Username or Password!']);
-            }
-            $user = Auth::user();
-
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json(['status' => 200, 'message' => 'Login Successfully!', 'access_token' => $token, 'user_id' => $user->id]);
-        } catch (Exception $e) {
-
-            return response()->json(['status' => 500, 'message' => 'An error occurred while user login. Please try again later.']);
-        }
-    }
 
     public function userAdd(Request $request)
     {
@@ -123,7 +92,7 @@ class UserController extends Controller
 
             $data = [];
 
-            $data[] = [
+            $data [] = [
 
                 'first_name'    =>    $user_data->name,
                 'last_name'     =>    $user_data->last_name,
@@ -133,6 +102,7 @@ class UserController extends Controller
             ];
 
             return response()->json(['status' => 200, 'message' => 'User data fetch successfully!', 'data' => $data]);
+            
         } catch (\Exception $e) {
 
             return response()->json(['status' => 500, 'message' => 'An error occurred while user edit. Please try again later.']);
@@ -177,7 +147,7 @@ class UserController extends Controller
                 return response()->json(['status' => 500, 'message' => $validator->errors()]);
             }
 
-            
+
 
             if (request()->hasFile('profile_image')) {
 
@@ -218,7 +188,7 @@ class UserController extends Controller
     }
 
     public function userDelete(Request $request)
-    {  
+    {
 
         try {
 
@@ -238,15 +208,36 @@ class UserController extends Controller
             if ($user->delete()) {
                 return response()->json(['status' => 200, 'message' => 'User Delete Sucessfully!']);
             }
-
         } catch (Exception $e) {
 
             return response()->json(['status' => 500, 'message' => 'An error occurred while user delete. Please try again later.']);
         }
     }
-    
-    public function userStatus(){
 
+    public function userStatus(Request $request)
+    {
+
+        try {
+
+            $user_id = $request->user_id;
+
+            $user_data = User::where('id', $user_id)->first();
+
+            if (!$user_data) {
+
+                return response()->json(['status' => 500, 'message' => 'User Not Found!']);
+            }
+            $user_data->status = $request->status;
+
+            if ($user_data->save()) {
+
+                return response()->json(['status' => 200, 'message' => 'User Status Change Successfully!']);
+            }
+            
+        } catch (\Exception $e) {
+
+            return response()->json(['status' => 500, 'message' => 'An error occurred while user status change. Please try again later.']);
+        }
     }
 
     public function logout(Request $request)
@@ -275,5 +266,4 @@ class UserController extends Controller
             return response()->json(['status' => 500, 'message' => 'An error occurred while user logout. Please try again later.']);
         }
     }
-
 }
