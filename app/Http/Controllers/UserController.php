@@ -246,7 +246,7 @@ class UserController extends Controller
     }
     
     public function userStatus(){
-        
+
     }
 
     public function logout(Request $request)
@@ -276,9 +276,4 @@ class UserController extends Controller
         }
     }
 
-
-    public function test()
-    {
-        dd("test");
-    }
 }
