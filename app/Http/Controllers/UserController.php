@@ -131,4 +131,10 @@ class UserController extends Controller
             return response()->json(['code' => 500, 'message' => 'An error occurred while user logout. Please try again later.']);
         }
     }
+
+
+    public function test()
+    {
+        dd("test");
+    }
 }
