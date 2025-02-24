@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +43,31 @@ class AuthController extends Controller
         }
     }
 
-    public function forgotPassword(Request $request){
+    public function logout(Request $request)
+    {
+        try {
+            $token = $request->bearerToken();
 
+            $tokenInstance = \App\Models\PersonalAccessToken::findToken($token);
+
+
+            if (!$tokenInstance) {
+
+                return response()->json(['status' => 401, 'message' => 'Unauthorized']);
+            }
+
+            if ($tokenInstance->delete()) {
+
+                $user = User::where('id', $tokenInstance->tokenable_id)->first();
+                $user->last_login_at = Carbon::now();
+                $user->save();
+
+                return response()->json(['status' => 200, 'message' => 'User Logout Successfully']);
+            }
+        } catch (Exception $e) {
+
+            return response()->json(['status' => 500, 'message' => 'An error occurred while user logout. Please try again later.']);
+        }
     }
+
 }

@@ -27,7 +27,7 @@ class UserController extends Controller
                 'last_name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:tbl_users',
                 // 'email' => 'required|string|email|max:255',
-                // 'mobile_number' => 'required|string|regex:/^\d{10}$/|unique:users',
+                'mobile_number' => 'required|string|regex:/^\d{10}$/|unique:users',
                 'profile_image' => 'nullable|mimes:jpeg,png,jpg',
                 'password' => 'required|string|min:8',
                 'role' => 'required'
@@ -97,6 +97,7 @@ class UserController extends Controller
                 'first_name'    =>    $user_data->name,
                 'last_name'     =>    $user_data->last_name,
                 'email'         =>    $user_data->email,
+                'mobile_number' =>    $user_data->mobile_number,
                 'profile_image' =>    url('profile_image' . '/' . $user_data->profile_image),
                 'role'          =>    $user_data->getRoleNames()
             ];
@@ -132,7 +133,12 @@ class UserController extends Controller
                 ],
                 // 'email' => 'required|string|email|max:255',
 
-                // 'mobile_number' => 'required|string|regex:/^\d{10}$/|unique:users',
+                'mobile_number' => [
+                    'required',
+                    'string',
+                    'regex:/^\d{10}$/',
+                    Rule::unique('users', 'mobile_number')->ignore($request->user_id),
+                ],
                 'profile_image' => 'nullable|mimes:jpeg,png,jpg',
                 'password' => 'required|string|min:8',
                 // 'role' => 'required'
@@ -146,8 +152,6 @@ class UserController extends Controller
                 Log::info('Validation errors', $validator->errors()->toArray());
                 return response()->json(['status' => 500, 'message' => $validator->errors()]);
             }
-
-
 
             if (request()->hasFile('profile_image')) {
 
@@ -170,6 +174,7 @@ class UserController extends Controller
             $user->name = $request->first_name;
             $user->last_name = $request->last_name;
             $user->email = $request->email;
+            $user->mobile_number =  $request->mobile_number;
 
             if ($user->save()) {
 
@@ -214,6 +219,58 @@ class UserController extends Controller
         }
     }
 
+    public function userList(Request $request){
+
+        try{
+
+            $query=User::query();
+            
+
+            if(isset($request->search)){
+
+                $query->where('name','like', '%' . $request->search . '%')
+                    ->orwhere('last_name','like','%' . $request->search . '%')
+                    ->orwhere('email','like','%' . $request->search . '%')
+                    ->orwhere('mobile_number','like','%' . $request->search . '%')
+                    ->orwhereHas('roles',function ($q) use($request){
+                        $q->where('name','like','%'.$request->search.'%');
+                });
+
+            }
+
+            $users=$query->get();
+
+            if(!$users){
+
+                return response()->json(['status'=>200,'message'=>'Data Not Found!']);
+            }
+
+            $user_data = [];
+
+            foreach($users as $user){
+
+                 $user_data[] = [
+
+                    'id'=>$user->id,
+                    'first_name' => $user->name,
+                    'last_name' => $user->last_name,
+                    'email' => $user->email,
+                    'mobile_number'=>$user->mobile_number,
+                    'status'=> $user->status,
+                    'roles' => $user->roles->pluck('name'),
+                ];
+            }
+
+            return response()->json($user_data);
+
+        }catch(\Exception $e){
+
+            return response()->json(['status' => 500, 'message' => 'An error occurred while user list. Please try again later.']);
+
+        }
+
+    }
+
     public function userStatus(Request $request)
     {
 
@@ -239,31 +296,5 @@ class UserController extends Controller
             return response()->json(['status' => 500, 'message' => 'An error occurred while user status change. Please try again later.']);
         }
     }
-
-    public function logout(Request $request)
-    {
-        try {
-            $token = $request->bearerToken();
-
-            $tokenInstance = \App\Models\PersonalAccessToken::findToken($token);
-
-
-            if (!$tokenInstance) {
-
-                return response()->json(['status' => 401, 'message' => 'Unauthorized']);
-            }
-
-            if ($tokenInstance->delete()) {
-
-                $user = User::where('id', $tokenInstance->tokenable_id)->first();
-                $user->last_login_at = Carbon::now();
-                $user->save();
-
-                return response()->json(['status' => 200, 'message' => 'User Logout Successfully']);
-            }
-        } catch (Exception $e) {
-
-            return response()->json(['status' => 500, 'message' => 'An error occurred while user logout. Please try again later.']);
-        }
-    }
+    
 }

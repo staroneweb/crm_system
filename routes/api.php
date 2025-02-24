@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,8 +22,8 @@ use App\Http\Controllers\AuthController;
 //     return $request->user();
 // });
 
-Route::post('login',[UserController::class,'login']);
-Route::post('logout',[UserController::class,'logout'])->middleware('auth.Token');
+Route::post('login',[AuthController::class,'login']);
+Route::post('logout',[AuthController::class,'logout'])->middleware('auth.Token');
 
 // Route::middleware(['auth.Token','role'])->group(function () {
 Route::middleware(['auth.Token'])->group(function () {
@@ -34,9 +36,16 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('user/update',[UserController::class,'userUpdate']);
     Route::post('user/delete',[UserController::class,'userDelete']);
     Route::post('user/status',[UserController::class,'userStatus']);
+    Route::post('user/search/list',[UserController::class,'userList']);
+    // search by
+
+    // first name,last name,email,mobile number
 
 
-    Route::post('forgot-password',[AuthController::class,'forgotPassword']);
+    // Route::post('forgot-password',[AuthController::class,'forgotPassword']);
+    Route::post('password/email',[ForgotPasswordController::class,'sendResetLinkEmail']);
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.reset');
+
 
 
 });
