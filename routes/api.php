@@ -43,8 +43,8 @@ Route::middleware(['auth.Token'])->group(function () {
 
 
     // Route::post('forgot-password',[AuthController::class,'forgotPassword']);
-    Route::post('password/email',[ForgotPasswordController::class,'sendResetLinkEmail']);
-    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.reset');
+    // Route::post('password/email',[ForgotPasswordController::class,'sendResetLinkEmail']);
+    // Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.reset');
 
 
 
