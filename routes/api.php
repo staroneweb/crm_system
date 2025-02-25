@@ -7,6 +7,8 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\LeadController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -53,7 +55,14 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('password/email',[ForgotPasswordController::class,'sendResetLinkEmail']);
     Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.reset');
 
+    Route::prefix('leads')->group(function () {
+        Route::get('/', [LeadController::class, 'index']); // List all leads
+        Route::post('/store', [LeadController::class, 'store']); // Add a lead
+        Route::get('/{id}', [LeadController::class, 'show']); // Show lead details
+        Route::delete('/{id}', [LeadController::class, 'destroy']); // Delete lead
+        Route::put('/{id}', [LeadController::class, 'update']); // Update lead
 
+    });
 
 });
 
