@@ -42,7 +42,7 @@ class AuthController extends Controller
                     'user_id' => $user->id,
                     'first_name'=>$user->name,
                     'last_name'=>$user->last_name,
-                    'profile_image'=>url('profile_image' . '/' . $user->profile_image),
+                    'profile_image'=>$user->profile_image ? url('profile_image' . '/' . $user->profile_image) : url('profile_image' . '/'.'null.png'),
                     'last_login_at'=>$user->last_login_at,
                     'user_roles'=>$user->getRoleNames()
             ]);
