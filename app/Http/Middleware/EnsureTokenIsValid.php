@@ -18,7 +18,7 @@ class EnsureTokenIsValid
     {
 
         if(!Auth::guard('sanctum')->check()){
-            return response()->json(['code'=>500,'message' => 'Unauthenticated. Please log in.']);
+            return response()->json(['status'=>500,'message' => 'Unauthenticated. Please log in.']);
 
         }
         return $next($request);
