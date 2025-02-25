@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
@@ -37,14 +38,20 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('user/delete',[UserController::class,'userDelete']);
     Route::post('user/status',[UserController::class,'userStatus']);
     Route::post('user/search/list',[UserController::class,'userList']);
-    // search by
+    
+    // Contacts
 
-    // first name,last name,email,mobile number
+    Route::post('contact/add',[ContactController::class,'contactAdd']);
+    Route::post('contact/edit',[ContactController::class,'contactEdit']);
+    Route::post('contact/update',[ContactController::class,'contactUpdate']);
+    Route::post('contact/delete',[ContactController::class,'contactDelete']);
+    // Route::post('contact/status',[ContactController::class,'contactStatus']);
+    Route::post('contact/search/list',[ContactController::class,'contactList']);
 
 
     // Route::post('forgot-password',[AuthController::class,'forgotPassword']);
-    // Route::post('password/email',[ForgotPasswordController::class,'sendResetLinkEmail']);
-    // Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.reset');
+    Route::post('password/email',[ForgotPasswordController::class,'sendResetLinkEmail']);
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.reset');
 
 
 

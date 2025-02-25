@@ -50,7 +50,15 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // public function roles(){
-        // return $this->hasMany(Role::class);
-    // }
+    public function assignedContacts()
+    {
+        return $this->hasMany(Contact::class, 'assigned_to', 'id');
+    }
+
+    public function createdContacts()
+    {
+        return $this->hasMany(Contact::class, 'created_by', 'id');
+    }
+
+
 }

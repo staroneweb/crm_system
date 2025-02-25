@@ -261,7 +261,7 @@ class UserController extends Controller
                 ];
             }
 
-            return response()->json($user_data);
+            return response()->json(['status'=>200,'data'=>$user_data]);
 
         }catch(\Exception $e){
 

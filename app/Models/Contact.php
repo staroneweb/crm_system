@@ -11,4 +11,15 @@ class Contact extends Model
 
     protected $table = "tbl_contacts";
 
+    public function assigned(){
+
+        return $this->belongsTo(User::class,'assigned_to','id');
+    }
+
+    public function createdby(){
+
+        return $this->belongsTo(User::class,'created_by','id');
+
+    }
+
 }
