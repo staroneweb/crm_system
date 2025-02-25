@@ -40,7 +40,10 @@ class AuthController extends Controller
                     'message' => 'Login Successfully!', 
                     'access_token' => $token, 
                     'user_id' => $user->id,
-                    'user_details'=>$user,
+                    'first_name'=>$user->name,
+                    'last_name'=>$user->last_name,
+                    'profile_image'=>url('profile_image' . '/' . $user->profile_image),
+                    'last_login_at'=>$user->last_login_at,
                     'user_roles'=>$user->getRoleNames()
             ]);
        
