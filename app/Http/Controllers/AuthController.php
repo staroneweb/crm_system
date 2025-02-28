@@ -36,6 +36,8 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
+            Log::info('Query Time 1: ' . microtime(true) - LARAVEL_START);
+            
             return response()->json([
                     'status' => 200,
                     'message' => 'Login Successfully!', 
@@ -47,7 +49,8 @@ class AuthController extends Controller
                     'last_login_at'=>$user->last_login_at,
                     'user_roles'=>$user->getRoleNames()
             ]);
-       
+           
+
         } catch (Exception $e) {
 
             return response()->json(['status' => 500, 'message' => 'An error occurred while user login. Please try again later.']);
@@ -93,9 +96,9 @@ class AuthController extends Controller
 
             $initials = strtoupper(substr($user_data->name, 0, 1)) . strtoupper(substr($user_data->last_name, 0, 1));
            
-            $data=[];
+            // $data=[];
 
-            $data[]=[
+            $data=[
                
                 'first_name'    =>$user_data->name,
                 'last_name'     =>$user_data->last_name,
