@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Lead;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Validator;
+
 
 class LeadController extends Controller
 {
@@ -57,13 +59,23 @@ class LeadController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
+            $validator=Validator::make($request->all(),[
                 'contact_id' => 'required|exists:tbl_contacts,id',
-                'source' => 'nullable|string|max:100',
+                'source' => 'required|string|max:100',
                 'stage' => 'required|in:new,qualified,proposal,won,lost',
-                'value' => 'nullable|numeric',
-                'assigned_to' => 'nullable|exists:tbl_users,id',
-            ]);
+                'value' => 'required|numeric',
+                'assigned_to' => 'required|exists:tbl_users,id',
+            ],
+            [
+                'contact_id.required' => 'The contact ID is required.', 
+                'assigned_to.required' => 'The Assign User is required.',
+            ]
+            
+        );
+
+            if($validator->fails()){
+                return response()->json(['status'=>422,'message'=>$validator->errors()]);
+            }
 
             $lead = Lead::create($request->all());
 
