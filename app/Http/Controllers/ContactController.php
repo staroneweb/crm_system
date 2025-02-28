@@ -27,7 +27,7 @@ class ContactController extends Controller
             ]);
 
             if($validator->fails()){
-                return response()->json(['status'=>500,'message'=>$validator->errors()]);
+                return response()->json(['status'=>422,'message'=>$validator->errors()]);
             }
 
             $contact = new Contact();
@@ -118,7 +118,7 @@ class ContactController extends Controller
             ]);
 
             if($validator->fails()){
-                return response()->json(['status'=>500,'message'=>$validator->errors()]);
+                return response()->json(['status'=>422,'message'=>$validator->errors()]);
             }
 
             $contact_data->first_name=$request->first_name;
