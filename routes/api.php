@@ -51,9 +51,15 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('contact/search/list',[ContactController::class,'contactList']);
 
 
-    // Route::post('forgot-password',[AuthController::class,'forgotPassword']);
+    // forget password
+
     Route::post('forgot/password',[ForgotPasswordController::class,'sendResetLinkEmail']);
     Route::post('reset/password', [ResetPasswordController::class, 'reset'])->name('password.reset');
+
+    // profile data
+
+    Route::post('profile/show',[AuthController::class,'profileShow']);
+    Route::post('profile/update',[AuthController::class,'profileUpdate']);
 
     Route::prefix('leads')->group(function () {
         Route::get('/', [LeadController::class, 'index']); // List all leads

@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -78,6 +79,104 @@ class AuthController extends Controller
 
             return response()->json(['status' => 500, 'message' => 'An error occurred while user logout. Please try again later.']);
         }
+    }
+
+    public function profileShow(Request $request){
+
+        try{
+
+            $user_data = User::where('id',$request->user_id)->first();
+
+            if(!$user_data){
+                return response()->json(['status'=>500,'message'=>'User Not Found!']);
+            }
+
+            $initials = strtoupper(substr($user_data->name, 0, 1)) . strtoupper(substr($user_data->last_name, 0, 1));
+           
+            $data=[];
+
+            $data[]=[
+               
+                'first_name'    =>$user_data->name,
+                'last_name'     =>$user_data->last_name,
+                'email'         =>$user_data->email,
+                'mobile_number' =>$user_data->mobile_number,
+                'text'          =>$initials,
+                'user_id'       =>$user_data->id,  
+                'roles'         =>$user_data->getRoleNames()
+            ];
+
+            return response()->json(['status'=>200,'data'=>$data]);
+
+        }catch(Exception $e){
+
+            return response()->json(['status' => 500, 'message' => 'An error occurred while user profile. Please try again later.']);
+
+        }
+
+    }
+    
+    public function profileUpdate(Request $request){
+
+        try{
+
+            $user = User::where('id', $request->user_id)->first();
+
+            if (!$user) {
+                return response()->json(['status' => 500, 'message' => 'User Not Found!']);
+            }
+
+            $validator = Validator::make($request->all(), [
+
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    Rule::unique('tbl_users')->ignore($request->user_id)
+                ],
+
+                'mobile_number' => [
+                    'required',
+                    'string',
+                    'regex:/^\d{10}$/',
+                    Rule::unique('tbl_users', 'mobile_number')->ignore($request->user_id),
+                ],
+                
+            ], [
+                'name.required' => 'The first name field is required.'
+
+            ]);
+
+            if ($validator->fails()) {
+
+                Log::info('Validation errors', $validator->errors()->toArray());
+                return response()->json(['status' => 422, 'message' => $validator->errors()]);
+            }
+
+            $user->name = $request->first_name;
+            $user->last_name = $request->last_name;
+            $user->email = $request->email;
+            $user->mobile_number =  $request->mobile_number;
+
+
+            if ($user->save()) {
+
+                return response()->json(['status' => 200, 'message' => 'User update Successfully!']);
+            } else {
+
+                return response()->json(['status' => 500, 'message' => 'User update Failed!']);
+            }
+
+
+        }catch(Exception $e){
+
+            return response()->json(['status' => 500, 'message' => 'An error occurred while user profile update. Please try again later.']);
+
+        }
+
     }
 
 }

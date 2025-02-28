@@ -55,6 +55,7 @@ class UserController extends Controller
             $user->name = $request->first_name;
             $user->last_name = $request->last_name;
             $user->email = $request->email;
+            $user->mobile_number =  $request->mobile_number;
             $user->status = 1;  // default active
             $user->password = Hash::make($request->password);
 
@@ -137,7 +138,7 @@ class UserController extends Controller
                     'required',
                     'string',
                     'regex:/^\d{10}$/',
-                    Rule::unique('users', 'mobile_number')->ignore($request->user_id),
+                    Rule::unique('tbl_users', 'mobile_number')->ignore($request->user_id),
                 ],
                 'profile_image' => 'nullable|mimes:jpeg,png,jpg',
                 'password' => 'required|string|min:8',
