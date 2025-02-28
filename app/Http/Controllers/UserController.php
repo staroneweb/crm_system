@@ -27,7 +27,7 @@ class UserController extends Controller
                 'last_name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:tbl_users',
                 // 'email' => 'required|string|email|max:255',
-                'mobile_number' => 'required|string|regex:/^\d{10}$/|unique:users',
+                'mobile_number' => 'required|string|regex:/^\d{10}$/|unique:tbl_users',
                 'profile_image' => 'nullable|mimes:jpeg,png,jpg',
                 'password' => 'required|string|min:8',
                 'role' => 'required'
@@ -37,7 +37,7 @@ class UserController extends Controller
 
             if ($validator->fails()) {
                 Log::info('Validation errors', $validator->errors()->toArray());
-                return response()->json(['status' => 500, 'message' => $validator->errors()]);
+                return response()->json(['status' => 422, 'message' => $validator->errors()]);
             }
 
             $user = new User();
@@ -150,7 +150,7 @@ class UserController extends Controller
             if ($validator->fails()) {
 
                 Log::info('Validation errors', $validator->errors()->toArray());
-                return response()->json(['status' => 500, 'message' => $validator->errors()]);
+                return response()->json(['status' => 422, 'message' => $validator->errors()]);
             }
 
             if (request()->hasFile('profile_image')) {
@@ -225,7 +225,6 @@ class UserController extends Controller
 
             $query=User::query();
             
-
             if(isset($request->search)){
 
                 $query->where('name','like', '%' . $request->search . '%')

@@ -19,13 +19,13 @@ class AuthController extends Controller
 
             $validator = Validator::make($request->all(), [
 
-                'email' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255',
                 'password' => 'required|string|min:8',
             ]);
 
             if ($validator->fails()) {
                 Log::info('Validation errors', $validator->errors()->toArray());
-                return response()->json(['status' => 500, 'message' => $validator->errors()]);
+                return response()->json(['status' => 422, 'message' => $validator->errors()]);
             }
 
             if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
