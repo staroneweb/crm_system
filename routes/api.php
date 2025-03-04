@@ -8,7 +8,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\LeadController;
-
+use App\Http\Controllers\SalesController;
+use App\Http\Controllers\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +61,25 @@ Route::middleware(['auth.Token'])->group(function () {
 
     Route::post('profile/show',[AuthController::class,'profileShow']);
     Route::post('profile/update',[AuthController::class,'profileUpdate']);
+
+    // Task
+
+    Route::post('task/add',[TaskController::class,'taskAdd']);
+    Route::post('task/edit',[TaskController::class,'taskEdit']);
+    Route::post('task/update',[TaskController::class,'taskUpdate']);
+    Route::post('task/delete',[TaskController::class,'taskDelete']);
+    Route::post('task/status',[TaskController::class,'taskStatus']);
+    Route::post('task/search/list',[TaskController::class,'taskList']);
+
+    // Sales
+
+    Route::post('sales/add',[SalesController::class,'salesAdd']);
+    Route::post('sales/edit',[SalesController::class,'salesEdit']);
+    Route::post('sales/update',[SalesController::class,'salesUpdate']);
+    Route::post('sales/delete',[SalesController::class,'salesDelete']);
+    Route::post('sales/search/list',[SalesController::class,'salesList']);
+
+    // leads
 
     Route::prefix('leads')->group(function () {
         Route::get('/', [LeadController::class, 'index']); // List all leads
