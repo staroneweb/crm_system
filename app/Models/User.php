@@ -60,5 +60,10 @@ class User extends Authenticatable
         return $this->hasMany(Contact::class, 'created_by', 'id');
     }
 
+    public function assigntask()
+    {
+       return $this->hasMany(Tasks::class,'assigned_to','id');
+    }
+
 
 }

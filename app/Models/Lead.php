@@ -34,4 +34,9 @@ class Lead extends Model
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
+
+    public function sales()
+    {
+        return $this->hasMany(Sales::class,'lead_id','id');
+    }
 }

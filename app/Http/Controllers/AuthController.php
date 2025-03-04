@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\ActivityLog; 
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -35,6 +36,12 @@ class AuthController extends Controller
             $user = Auth::user();
 
             $token = $user->createToken('auth_token')->plainTextToken;
+
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'activity_type' => 'Login',
+                'details' => json_encode(['ip' => request()->ip()]),
+            ]);
 
             Log::info('Query Time 1: ' . microtime(true) - LARAVEL_START);
             
@@ -133,13 +140,13 @@ class AuthController extends Controller
 
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
-                'email' => [
-                    'required',
-                    'string',
-                    'email',
-                    'max:255',
-                    Rule::unique('tbl_users')->ignore($request->user_id)
-                ],
+                // 'email' => [
+                //     'required',
+                //     'string',
+                //     'email',
+                //     'max:255',
+                //     Rule::unique('tbl_users')->ignore($request->user_id)
+                // ],
 
                 'mobile_number' => [
                     'required',
@@ -156,12 +163,12 @@ class AuthController extends Controller
             if ($validator->fails()) {
 
                 Log::info('Validation errors', $validator->errors()->toArray());
-                return response()->json(['status' => 422, 'message' => $validator->errors()]);
+                return response()->json(['status' => 422, 'message' =>$validator->errors()]);
             }
 
             $user->name = $request->first_name;
             $user->last_name = $request->last_name;
-            $user->email = $request->email;
+            // $user->email = $request->email;
             $user->mobile_number =  $request->mobile_number;
 
 
