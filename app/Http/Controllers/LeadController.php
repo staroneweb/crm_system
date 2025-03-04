@@ -58,6 +58,9 @@ class LeadController extends Controller
     // Store a new lead
     public function store(Request $request)
     {
+
+       // dd($request);
+
         try {
             $validator=Validator::make($request->all(),[
                 'contact_id' => 'required|exists:tbl_contacts,id',
