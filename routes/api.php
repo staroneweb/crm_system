@@ -10,6 +10,7 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,6 +90,11 @@ Route::middleware(['auth.Token'])->group(function () {
         Route::put('/{id}', [LeadController::class, 'update']); // Update lead
 
     });
+
+    // notification
+
+    Route::post('/notifications', [NotificationController::class, 'store']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
 
 });
 
