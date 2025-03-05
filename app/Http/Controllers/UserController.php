@@ -205,7 +205,7 @@ class UserController extends Controller
                 return response()->json(['status' => 500, 'message' => 'User Not Found!']);
             }
 
-            $image_path = public_path('profile_image/' . $user->profile_image);
+            $image_path = $user->profile_image ? public_path('profile_image/' . $user->profile_image):null;
 
             if (File::exists($image_path)) {
                 unlink($image_path);
