@@ -31,17 +31,17 @@ class ForgotPasswordController extends Controller
             $token =Str::random(60);
             $expires_at = Carbon::now()->addMinutes(5);
 
-            $data = new PasswordReset();
-            $data->email = $request->email;
-            $data->token = $token;
-            // $data->created_at = Carbon::now();
-            // $data->updated_at = Carbon::now();
-            $data->expires_at = $expires_at;
-            $data->save();
+            PasswordReset::updateOrCreate(
+                ['email' => $request->email], 
+                [
+                    'token' => $token,
+                    'expires_at' => $expires_at
+                ]
+            );
                     
             $token = PasswordReset::where('email', $request->email)->value('token');
 
-            $frontendLink = url("/reset-password?token=$token");
+            $frontendLink = "http://localhost:3000/reset-password?token=$token";
 
             Mail::send('emails.password_reset', ['frontendLink' => $frontendLink], function ($message) use ($request) {
                 $message->from('no-reply@yourdomain.com', 'Your App Name')
