@@ -23,16 +23,17 @@ class UserController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'first_name' => 'required|string|max:255',
-                'last_name' => 'required|string|max:255',
+                'first_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
+                'last_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
                 'email' => 'required|string|email|max:255|unique:tbl_users',
                 // 'email' => 'required|string|email|max:255',
-                'mobile_number' => 'required|string|regex:/^\d{10}$/|unique:tbl_users',
+                'mobile_number' => 'required|string|regex:/^\d{10}$/|digits:10|unique:tbl_users',
                 'profile_image' => 'nullable|mimes:jpeg,png,jpg',
-                'password' => 'required|string|min:8',
+                'password' => 'required|string|min:8|confirmed',
                 'role' => 'required'
             ], [
-                'name.required' => 'The first name field is required.'
+                'name.required' => 'The first name field is required.',
+                'mobile_number.regex'=>'Invalid phone number format. Please enter a 10-digit number.'
             ]);
 
             if ($validator->fails()) {
@@ -99,7 +100,7 @@ class UserController extends Controller
                 'last_name'     =>    $user_data->last_name,
                 'email'         =>    $user_data->email,
                 'mobile_number' =>    $user_data->mobile_number,
-                'profile_image' =>    url('profile_image' . '/' . $user_data->profile_image),
+                'profile_image' =>    $user_data->profile_image ? url('profile_image' . '/' . $user_data->profile_image) : url('profile_image' . '/'.'null.png'),
                 'role'          =>    $user_data->getRoleNames()
             ];
 
@@ -123,8 +124,8 @@ class UserController extends Controller
 
             $validator = Validator::make($request->all(), [
 
-                'first_name' => 'required|string|max:255',
-                'last_name' => 'required|string|max:255',
+                'first_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
+                'last_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
                 'email' => [
                     'required',
                     'string',
@@ -141,10 +142,11 @@ class UserController extends Controller
                     Rule::unique('tbl_users', 'mobile_number')->ignore($request->user_id),
                 ],
                 'profile_image' => 'nullable|mimes:jpeg,png,jpg',
-                'password' => 'required|string|min:8',
+                // 'password' => 'required|string|min:8|confirmed',
                 // 'role' => 'required'
             ], [
-                'name.required' => 'The first name field is required.'
+                'name.required' => 'The first name field is required.',
+                'mobile_number.regex'=>'Invalid phone number format. Please enter a 10-digit number.'
 
             ]);
 
@@ -170,6 +172,11 @@ class UserController extends Controller
                 $newfilename = md5($filename) . rand(10, 1000) . time() . '.' . $ext;
 
                 $user->profile_image = $newfilename;
+
+            }else{
+
+                $user->profile_image = "null.png";
+
             }
 
             $user->name = $request->first_name;
@@ -258,6 +265,7 @@ class UserController extends Controller
                     'mobile_number'=>$user->mobile_number,
                     'status'=> $user->status,
                     'roles' => $user->roles->pluck('name'),
+                    'profile_image' =>    $user->profile_image ? url('profile_image' . '/' . $user->profile_image) : url('profile_image' . '/'.'null.png'),
                 ];
             }
 
@@ -294,6 +302,37 @@ class UserController extends Controller
         } catch (\Exception $e) {
 
             return response()->json(['status' => 500, 'message' => 'An error occurred while user status change. Please try again later.']);
+        }
+    }
+
+    public function userNameList(){
+
+        try{
+
+            $user_name_list=User::where('status',1)->get();
+
+            if ($user_name_list->isEmpty()) {
+                return response()->json(['status' =>200,'message' => 'Data Not Found!']);
+            }
+
+            $data =[];
+ 
+            foreach($user_name_list as $u_l){
+
+                $data[]=[
+
+                    'id'=>$u_l->id,
+                    'name'=>$u_l->name.' '.$u_l->last_name
+
+                ];
+
+            }
+
+            return response()->json(['status'=>200,'data'=>$data]);
+
+        }catch (\Exception $e) {
+
+            return response()->json(['status' => 500, 'message' => 'An error occurred while user list. Please try again later.']);
         }
     }
     

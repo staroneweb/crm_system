@@ -11,6 +11,8 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SourceController;
+use App\Http\Controllers\StageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +32,13 @@ use App\Http\Controllers\NotificationController;
 Route::post('login',[AuthController::class,'login']);
 Route::post('logout',[AuthController::class,'logout'])->middleware('auth.Token');
 
+
+// forget password
+
+Route::post('forgot/password',[ForgotPasswordController::class,'sendResetLinkEmail']);
+Route::post('reset/password', [ResetPasswordController::class, 'reset'])->name('password.reset');
+
+
 // Route::middleware(['auth.Token','role'])->group(function () {
 Route::middleware(['auth.Token'])->group(function () {
 
@@ -42,6 +51,8 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('user/delete',[UserController::class,'userDelete']);
     Route::post('user/status',[UserController::class,'userStatus']);
     Route::post('user/search/list',[UserController::class,'userList']);
+    Route::get('user/name/list',[UserController::class,'userNameList']);
+
     
     // Contacts
 
@@ -51,12 +62,7 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('contact/delete',[ContactController::class,'contactDelete']);
     // Route::post('contact/status',[ContactController::class,'contactStatus']);
     Route::post('contact/search/list',[ContactController::class,'contactList']);
-
-
-    // forget password
-
-    Route::post('forgot/password',[ForgotPasswordController::class,'sendResetLinkEmail']);
-    Route::post('reset/password', [ResetPasswordController::class, 'reset'])->name('password.reset');
+    Route::get('contact/name/list',[ContactController::class,'contactNameList']);
 
     // profile data
 
@@ -80,6 +86,25 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('sales/delete',[SalesController::class,'salesDelete']);
     Route::post('sales/search/list',[SalesController::class,'salesList']);
 
+    // source
+
+    Route::post('source/add',[SourceController::class,'sourceAdd']);
+    Route::post('source/edit',[SourceController::class,'sourceEdit']);
+    Route::post('source/update',[SourceController::class,'sourceUpdate']);
+    Route::post('source/delete',[SourceController::class,'sourceDelete']);
+    Route::post('source/search/list',[SourceController::class,'sourceList']);
+    Route::post('source/status/update',[SourceController::class,'sourceStatus']);
+
+    // stage
+
+    Route::post('stage/add',[StageController::class,'stageAdd']);
+    Route::post('stage/edit',[StageController::class,'stageEdit']);
+    Route::post('stage/update',[StageController::class,'stageUpdate']);
+    Route::post('stage/delete',[StageController::class,'stageDelete']);
+    Route::post('stage/search/list',[StageController::class,'stageList']);
+    Route::post('stage/status/update',[StageController::class,'stageStatus']);
+
+
     // leads
 
     Route::prefix('leads')->group(function () {
@@ -93,8 +118,11 @@ Route::middleware(['auth.Token'])->group(function () {
 
     // notification
 
-    Route::post('/notifications', [NotificationController::class, 'store']);
-    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications-add', [NotificationController::class, 'store']);
+    Route::post('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications-show', [NotificationController::class, 'show']);
+    Route::post('/notifications-update', [NotificationController::class, 'update']);
+    Route::post('/notifications-destroy', [NotificationController::class, 'destroy']);
 
 });
 

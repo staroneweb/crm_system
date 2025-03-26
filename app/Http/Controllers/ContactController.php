@@ -36,7 +36,7 @@ class ContactController extends Controller
             $contact->email= $request->email;
             $contact->phone = $request->phone;
             $contact->company = $request->company;
-            $contact->created_by = $request->created_by;
+            $contact->created_by = $request->added_by;
             $contact->assigned_to = $request->assigned_to;
 
             if($contact->save()){
@@ -73,7 +73,7 @@ class ContactController extends Controller
                     'phone'=>$contact_data->phone,
                     'company'=>$contact_data->company,
                     'status'=>$contact_data->status,
-                    'created_by'=>$contact_data->created_by,
+                    'added_by'=>$contact_data->created_by,
                     'assigned_to'=>$contact_data->assigned_to
             ];
 
@@ -127,7 +127,7 @@ class ContactController extends Controller
             $contact_data->phone = $request->phone;
             $contact_data->company = $request->company;
             $contact_data->status= $request->status;
-            $contact_data->created_by = $request->created_by;
+            $contact_data->created_by = $request->added_by;
             $contact_data->assigned_to = $request->assigned_to;
 
             if($contact_data->save()){
@@ -238,8 +238,8 @@ class ContactController extends Controller
                     'phone'=>$contact->phone,
                     'company'=>$contact->company,
                     'status'=> $contact->status,
-                    'Assign User'=>$contact->assigned->name,
-                    'Added By'=>$contact->createdby->name
+                    'assign_user'=>$contact->assigned->name,
+                    'added_by'=>$contact->createdby->name
                 ];
             }
 
@@ -251,5 +251,37 @@ class ContactController extends Controller
             return response()->json(['status' => 500, 'message' => 'An error occurred while contact list. Please try again later.']);
             
         }
+    }
+    public function contactNameList(Request $request){
+
+        try
+        {
+            $contact_name_list=Contact::all();
+
+            if ($contact_name_list->isEmpty()) {
+                return response()->json(['status' =>200,'message' => 'Data Not Found!']);
+            }
+
+            $data =[];
+ 
+            foreach($contact_name_list as $c_l){
+
+                $data[]=[
+
+                    'id'=>$c_l->id,
+                    'name'=>$c_l->first_name.' '.$c_l->last_name
+
+                ];
+
+            }
+
+            return response()->json(['status'=>200,'data'=>$data]);
+
+        }catch(\Exception $e){
+ 
+            return response()->json(['status' => 500, 'message' => 'An error occurred while contact name list. Please try again later.']);
+            
+        }
+
     }
 }
