@@ -14,15 +14,23 @@ class LeadController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Lead::with(['contact:id,first_name,last_name', 'assignedUser:id,name']); // Eager load contact & assigned user
+            $query = Lead::with([
+                'source:id,source_name', // Eager load lead source with name
+                'status:id,stage_name', // Eager load lead status with name
+                'assignedUser:id,name'
+            ]);
 
             // Apply search filters
-            if ($request->has('source')) {
-                $query->where('source', 'LIKE', "%{$request->source}%");
+            if ($request->has('lead_source')) {
+                $query->whereHas('source', function ($q) use ($request) {
+                    $q->where('source_name', 'LIKE', "%{$request->lead_source}%");
+                });
             }
 
-            if ($request->has('stage')) {
-                $query->where('stage', $request->stage);
+            if ($request->has('lead_status')) {
+                $query->whereHas('status', function ($q) use ($request) {
+                    $q->where('stage_name', 'LIKE', "%{$request->lead_status}%");
+                });
             }
 
             if ($request->has('assigned_to')) {
@@ -31,21 +39,20 @@ class LeadController extends Controller
 
             $leads = $query->paginate(10);
 
-
             return response()->json([
                 'status' => 200,
                 'message' => 'Leads fetched successfully',
                 'leads' => collect($leads->items())->map(function ($lead) {
                     return [
                         'id' => $lead->id,
-                        'contact_name' => $lead->contact->first_name . " " . $lead->contact->last_name ?? null,
-                        'source' => $lead->source,
-                        'stage' => $lead->stage,
-                        'value' => $lead->value,
-                        //'assigned_to' => $lead->assigned_to,
+                        'name' => $lead->name,
+                        'source' => $lead->source->source_name ?? null,
+                        'status' => $lead->status->stage_name ?? null,
+                        'company_name' => $lead->company_name,
+                        'opportunity_amount' => $lead->opportunity_amount,
                         'assigned_user_name' => $lead->assignedUser->name ?? null,
-                        'created_at' => $lead->created_at ? $lead->created_at->format('d-M-Y H:i:s') : null, // Format DateTime
-                        'updated_at' => $lead->updated_at ? $lead->updated_at->format('d-M-Y H:i:s') : null, // Format DateTime
+                        'created_at' => $lead->created_at ? $lead->created_at->format('d-M-Y H:i:s') : null,
+                        'updated_at' => $lead->updated_at ? $lead->updated_at->format('d-M-Y H:i:s') : null,
                     ];
                 }),
             ]);
