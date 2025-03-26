@@ -175,4 +175,35 @@ class SourceController extends Controller
             return response()->json(['status' => 500, 'message' => 'An error occurred while source status update. Please try again later.']);
         }
     }
+    public function sourceNameList(){
+
+        try{
+
+            $source_name_list=Source::where('status',1)->get();
+
+            if ($source_name_list->isEmpty()) {
+                return response()->json(['status' =>200,'message' => 'Data Not Found!']);
+            }
+
+            $data =[];
+ 
+            foreach($source_name_list as $s_l){
+
+                $data[]=[
+
+                    'id'=>$s_l->id,
+                    'source_name'=>$s_l->source_name
+
+                ];
+
+            }
+
+            return response()->json(['status'=>200,'data'=>$data]);
+
+        }catch(\Exception $e){
+
+            return response()->json(['status' => 500, 'message' => 'An error occurred while source name list. Please try again later.']);
+
+        }
+    }
 }
