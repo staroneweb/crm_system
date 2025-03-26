@@ -175,5 +175,36 @@ class StageController extends Controller
             return response()->json(['status' => 500, 'message' => 'An error occurred while stage status update. Please try again later.']);
         }
     }
+    public function stageNameList(){
+
+        try{
+
+            $stage_name_list=Stage::where('status',1)->get();
+
+            if ($stage_name_list->isEmpty()) {
+                return response()->json(['status' =>200,'message' => 'Data Not Found!']);
+            }
+
+            $data =[];
+ 
+            foreach($stage_name_list as $s_l){
+
+                $data[]=[
+
+                    'id'=>$s_l->id,
+                    'stage_name'=>$s_l->stage_name
+
+                ];
+
+            }
+
+            return response()->json(['status'=>200,'data'=>$data]);
+
+        }catch(\Exception $e){
+
+            return response()->json(['status' => 500, 'message' => 'An error occurred while stage name list. Please try again later.']);
+
+        }
+    }
 
 }

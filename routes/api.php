@@ -94,6 +94,7 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('source/delete',[SourceController::class,'sourceDelete']);
     Route::post('source/search/list',[SourceController::class,'sourceList']);
     Route::post('source/status/update',[SourceController::class,'sourceStatus']);
+    Route::get('source/name/list',[SourceController::class,'sourceNameList']);
 
     // stage
 
@@ -103,6 +104,7 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('stage/delete',[StageController::class,'stageDelete']);
     Route::post('stage/search/list',[StageController::class,'stageList']);
     Route::post('stage/status/update',[StageController::class,'stageStatus']);
+    Route::get('stage/name/list',[StageController::class,'stageNameList']);
 
 
     // leads
