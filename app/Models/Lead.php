@@ -18,11 +18,13 @@ class Lead extends Model
         'contact',
         'lead_source',
         'lead_status',
+        'lead_stage',
         'company_name',
         'company_website',
         'opportunity_amount',
         'description',
         'referred_by',
+        'value',
         'assigned_to',
     ];
 
@@ -42,11 +44,14 @@ class Lead extends Model
     {
         return $this->belongsTo(Source::class, 'lead_source');
     }
+    public function stage()
+    {
+        return $this->belongsTo(Stage::class, 'lead_stage');
+    }
 
-   
     public function status()
     {
-        return $this->belongsTo(Stage::class, 'lead_status');
+        return $this->belongsTo(LeadStatus::class, 'lead_status');
     }
 
 
