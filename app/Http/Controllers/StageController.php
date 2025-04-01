@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Stage;
+use App\Models\Lead;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,7 @@ class StageController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'stage_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
+                'stage_name' => 'required|string|max:255',
             ]);
 
             if ($validator->fails()) {
@@ -70,7 +71,7 @@ class StageController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'stage_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
+                'stage_name' => 'required|string|max:255',
                 'status'      => 'required'
             ]);
 
@@ -103,6 +104,10 @@ class StageController extends Controller
             if (!$stage_data) {
 
                 return response()->json(['status' => 200, 'message' => 'Data Not Found!']);
+            }
+
+            if(Lead::where('lead_stage', $stage_data->id)->exists()){
+                return response()->json(['code' => 500, 'message' => "Can't delete this stage; it's assigned to lead."]);
             }
 
             if ($stage_data->delete()) {
@@ -139,7 +144,10 @@ class StageController extends Controller
 
                     'id' => $stage->id,
                     'stage_name' => $stage->stage_name,
-                    'status' => $stage->status
+                    'status' => $stage->status,
+                    'log' => "Create DateTime : " . ($stage->created_at ? $stage->created_at->format('d-M-Y H:i:s') : 'N/A') .
+                            " | Last Modified DateTime : " . ($stage->updated_at ? $stage->updated_at->format('d-M-Y H:i:s') : 'N/A'),
+
                 ];
             }
 

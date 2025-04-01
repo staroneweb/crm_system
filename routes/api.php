@@ -13,6 +13,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SourceController;
 use App\Http\Controllers\StageController;
+use App\Http\Controllers\LeadStatusController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,7 +87,7 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('sales/delete',[SalesController::class,'salesDelete']);
     Route::post('sales/search/list',[SalesController::class,'salesList']);
 
-    // source
+    // Lead source
 
     Route::post('source/add',[SourceController::class,'sourceAdd']);
     Route::post('source/edit',[SourceController::class,'sourceEdit']);
@@ -96,7 +97,7 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('source/status/update',[SourceController::class,'sourceStatus']);
     Route::get('source/name/list',[SourceController::class,'sourceNameList']);
 
-    // stage
+    // Lead stage
 
     Route::post('stage/add',[StageController::class,'stageAdd']);
     Route::post('stage/edit',[StageController::class,'stageEdit']);
@@ -106,16 +107,27 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('stage/status/update',[StageController::class,'stageStatus']);
     Route::get('stage/name/list',[StageController::class,'stageNameList']);
 
+    // Lead status
+
+    Route::post('status/add',[LeadStatusController::class,'statusAdd']);
+    Route::post('status/edit',[LeadStatusController::class,'statusEdit']);
+    Route::post('status/update',[LeadStatusController::class,'statusUpdate']);
+    Route::post('status/delete',[LeadStatusController::class,'statusDelete']);
+    Route::post('status/search/list',[LeadStatusController::class,'statusList']);
+    Route::post('status',[LeadStatusController::class,'Status']);   // active and inactive status
+    Route::get('status/name/list',[LeadStatusController::class,'statusNameList']);
+
 
     // leads
 
     Route::prefix('leads')->group(function () {
-        Route::get('/', [LeadController::class, 'index']); // List all leads
+        Route::post('/list', [LeadController::class, 'index']); // List all leads
         Route::post('/store', [LeadController::class, 'store']); // Add a lead
-        Route::get('/{id}', [LeadController::class, 'show']); // Show lead details
-        Route::delete('/{id}', [LeadController::class, 'destroy']); // Delete lead
-        Route::put('/{id}', [LeadController::class, 'update']); // Update lead
-
+        Route::post('/show', [LeadController::class, 'show']); // Show lead details
+        Route::post('/fetch', [LeadController::class, 'edit']); // edit lead details
+        Route::post('/delete', [LeadController::class, 'destroy']); // Delete lead
+        Route::post('/update', [LeadController::class, 'update']); // Update lead
+ 
     });
 
     // notification

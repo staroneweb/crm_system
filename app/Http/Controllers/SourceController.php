@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Source;
+use App\Models\Lead;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,7 +14,7 @@ class SourceController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'source_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
+                'source_name' => 'required|string|max:255',
             ]);
 
             if ($validator->fails()) {
@@ -71,7 +72,7 @@ class SourceController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'source_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
+                'source_name' => 'required|string|max:255',
                 'status'      => 'required'
             ]);
 
@@ -104,6 +105,10 @@ class SourceController extends Controller
             if (!$source_data) {
 
                 return response()->json(['status' => 200, 'message' => 'Data Not Found!']);
+            }
+
+            if(Lead::where('lead_source', $source_data->id)->exists()){
+                return response()->json(['code' => 500, 'message' => "Can't delete this stage; it's assigned to lead."]);
             }
 
             if ($source_data->delete()) {
@@ -139,7 +144,9 @@ class SourceController extends Controller
 
                     'id' => $source->id,
                     'source_name' => $source->source_name,
-                    'status' => $source->status
+                    'status' => $source->status,
+                    'log' => "Create DateTime : " . ($source->created_at ? $source->created_at->format('d-M-Y H:i:s') : 'N/A') .
+                            " | Last Modified DateTime : " . ($source->updated_at ? $source->updated_at->format('d-M-Y H:i:s') : 'N/A'),
                 ];
             }
 
