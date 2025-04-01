@@ -265,7 +265,7 @@ class UserController extends Controller
                     'mobile_number'=>$user->mobile_number,
                     'status'=> $user->status,
                     'roles' => $user->roles->pluck('name'),
-                    'profile_image' =>    $user->profile_image ? url('profile_image' . '/' . $user->profile_image) : url('profile_image' . '/'.'null.png'),
+                    'profile_image' =>    $user->profile_image ? url('profile_image' . '/' . $user->profile_image) : url('profile_image' . '/'. $user->profile_image),
                     'log' => "Create DateTime : " . ($user->created_at ? $user->created_at->format('d-M-Y H:i:s') : 'N/A') .
                             " | Last Modified DateTime : " . ($user->updated_at ? $user->updated_at->format('d-M-Y H:i:s') : 'N/A'),
  
