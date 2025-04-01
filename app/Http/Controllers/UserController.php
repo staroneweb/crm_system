@@ -23,8 +23,8 @@ class UserController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'first_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
-                'last_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:tbl_users',
                 // 'email' => 'required|string|email|max:255',
                 'mobile_number' => 'required|string|regex:/^\d{10}$/|digits:10|unique:tbl_users',
@@ -124,8 +124,8 @@ class UserController extends Controller
 
             $validator = Validator::make($request->all(), [
 
-                'first_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
-                'last_name' => 'required|string|max:255|regex:/^[A-Za-z\s]+$/',
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
                 'email' => [
                     'required',
                     'string',
@@ -266,6 +266,9 @@ class UserController extends Controller
                     'status'=> $user->status,
                     'roles' => $user->roles->pluck('name'),
                     'profile_image' =>    $user->profile_image ? url('profile_image' . '/' . $user->profile_image) : url('profile_image' . '/'.'null.png'),
+                    'log' => "Create DateTime : " . ($user->created_at ? $user->created_at->format('d-M-Y H:i:s') : 'N/A') .
+                            " | Last Modified DateTime : " . ($user->updated_at ? $user->updated_at->format('d-M-Y H:i:s') : 'N/A'),
+ 
                 ];
             }
 
