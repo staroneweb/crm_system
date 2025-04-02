@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('tbl_tasks', function (Blueprint $table) {
 
             // Remove old fields
-            $table->dropColumn(['title', 'description']);
+            $table->dropColumn(['title', 'description','status']);
 
             // Add new fields
             $table->unsignedBigInteger('lead_id')->nullable()->after('id');
@@ -52,6 +52,7 @@ return new class extends Migration
             // Restore old fields
             $table->string('title')->after('id');
             $table->text('description')->nullable()->after('title');
+            $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending')->after('duration');
         });
     }
 };
