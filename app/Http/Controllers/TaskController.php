@@ -16,10 +16,12 @@ class TaskController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'title' => 'required',
-                'description' => 'required',
+                'task_name' => 'required',
+                'task_description' => 'required',
                 'assigned_to' => 'required',
-                'due_date'  => 'required'
+                'due_date'  => 'required',
+                'duration'=>'required',
+                'start_datetime'=>'required'
             ]);
 
             if ($validator->fails()) {
@@ -27,10 +29,16 @@ class TaskController extends Controller
             }
 
             $due_date = Carbon::createFromFormat('d-m-Y', $request->due_date)->format('Y-m-d');
+            $start_datetime = Carbon::createFromFormat('d-m-Y', $request->start_datetime)->format('Y-m-d');
+
 
             $task = new Tasks();
-            $task->title = $request->title;
-            $task->description = $request->description;
+            $task->lead_id = $request->lead_id;
+            $task->task_name = $request->task_name;
+            $task->task_description = $request->task_description;
+            $task->status_id = $request->status_id;
+            $task->start_datetime = $start_datetime;
+            $task->duration=$request->duration;
             $task->assigned_to = $request->assigned_to;
             $task->due_date = $due_date;
 
@@ -51,7 +59,7 @@ class TaskController extends Controller
 
         try {
 
-            $task_data = Tasks::with(['assignedUser'])->where('id', $request->task_id)->first();
+            $task_data = Tasks::with(['assignedUser','status'])->where('id', $request->task_id)->first();
 
             if (!$task_data) {
                 return response()->json(['status' => 500, 'message' => 'Task Not Found!']);
@@ -60,9 +68,12 @@ class TaskController extends Controller
             $data[] = [
 
                 'task_id'   => $task_data->id,
-                'task_title' => $task_data->title,
-                'description' => $task_data->description,
+                'task_name' => $task_data->task_name,
+                'task_description' => $task_data->task_description,
+                'status'=> $task_data->status->status_name,
+                'start_datetime' => Carbon::parse($task_data->start_datetime)->format('d-m-Y'),
                 'assigned_to' => $task_data->assignedUser->name,
+                'duration' => $task_data->duration,
                 'due_date'    => Carbon::parse($task_data->due_date)->format('d-m-Y')
 
             ];
@@ -84,11 +95,12 @@ class TaskController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'title' => 'required',
-                'description' => 'required',
+                'task_name' => 'required',
+                'task_description' => 'required',
                 'assigned_to' => 'required',
                 'due_date'  => 'required',
-                'status'   => 'required'
+                'duration'=>'required',
+                'start_datetime'=>'required'
             ]);
 
             if ($validator->fails()) {
@@ -96,13 +108,16 @@ class TaskController extends Controller
             }
 
             $due_date = Carbon::createFromFormat('d-m-Y', $request->due_date)->format('Y-m-d');
+            $start_datetime = Carbon::createFromFormat('d-m-Y', $request->start_datetime)->format('Y-m-d');
 
 
-            $task_data->title = $request->title;
-            $task_data->description = $request->description;
+            $task_data->task_name = $request->task_name;
+            $task_data->task_description = $request->task_description;
+            $task_data->status_id = $request->status_id;
+            $task_data->start_datetime = $start_datetime;
+            $task_data->duration=$request->duration;
             $task_data->assigned_to = $request->assigned_to;
             $task_data->due_date = $due_date;
-            $task_data->status = $request->status;
 
             if ($task_data->save()) {
 
@@ -145,24 +160,28 @@ class TaskController extends Controller
 
         try {
 
-            $query = Tasks::with(['assignedUser']);
+            $query = Tasks::with(['assignedUser','status']);
 
             if (preg_match('/\d{2}-\d{2}-\d{4}/', $request->search)) {
 
-                $due_date = Carbon::createFromFormat('d-m-Y', $request->search)->format('Y-m-d');
+                $date = Carbon::createFromFormat('d-m-Y', $request->search)->format('Y-m-d');
 
             } else {
 
-                $due_date = null;
+                $date = null;
             }
 
 
             if (isset($request->search)) {
 
-                $query->where('title', 'like', '%' . $request->search . '%')
-                    ->orwhere('description', 'like', '%' . $request->search . '%')
-                    ->orwhere('status', 'like', '%' . $request->search . '%')
-                    ->orwhere('due_date', $due_date)
+                $query->where('task_name', 'like', '%' . $request->search . '%')
+                    ->orwhere('task_description', 'like', '%' . $request->search . '%')
+                    ->orwhere('duration', 'like', '%' . $request->search . '%')
+                    ->orwhere('due_date', $date)
+                    ->orwhere('start_datetime', $date)
+                    ->orwhereHas('status', function ($q) use ($request) {
+                        $q->where('status_name', 'like', '%' . $request->search . '%');
+                    })
                     ->orwhereHas('assignedUser', function ($q) use ($request) {
                         $q->where('name', 'like', '%' . $request->search . '%');
                     });
@@ -170,7 +189,7 @@ class TaskController extends Controller
 
             $task_data = $query->get();
 
-            if (!$task_data) {
+            if ($task_data->isEmpty()) {
 
                 return response()->json(['status' => 200, 'message' => 'Data Not Found!']);
             }
@@ -181,11 +200,13 @@ class TaskController extends Controller
 
                 $data[] = [
                     'task_id' => $t_d->id,
-                    'title'  => $t_d->title,
-                    'description' => $t_d->description,
+                    'task_name'  => $t_d->task_name,
+                    'task_description' => $t_d->task_description,
+                    'status'=>$t_d->status->status_name,
+                    'start_datetime'=>Carbon::parse($t_d->start_datetime)->format('d-m-Y'),
                     'assigned_to' => $t_d->assignedUser->name,
                     'due_date'  => Carbon::parse($t_d->due_date)->format('d-m-Y'),
-                    'status' => $t_d->status
+                    'duration' => $t_d->duration,
                 ];
             }
 
