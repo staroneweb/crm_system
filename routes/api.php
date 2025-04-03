@@ -14,6 +14,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SourceController;
 use App\Http\Controllers\StageController;
 use App\Http\Controllers\LeadStatusController;
+use App\Http\Controllers\MeetingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -127,7 +128,7 @@ Route::middleware(['auth.Token'])->group(function () {
         Route::post('/fetch', [LeadController::class, 'edit']); // edit lead details
         Route::post('/delete', [LeadController::class, 'destroy']); // Delete lead
         Route::post('/update', [LeadController::class, 'update']); // Update lead
- 
+
     });
 
     // notification
@@ -137,6 +138,14 @@ Route::middleware(['auth.Token'])->group(function () {
     Route::post('/notifications-show', [NotificationController::class, 'show']);
     Route::post('/notifications-update', [NotificationController::class, 'update']);
     Route::post('/notifications-destroy', [NotificationController::class, 'destroy']);
+
+
+       // meetings
+    Route::post('/meetings/list', [MeetingController::class, 'index']); // Get all meetings
+    Route::post('/meetings/create', [MeetingController::class, 'store']); // Create a meeting
+    Route::post('/meetings/detail', [MeetingController::class, 'show']); // Get a single meeting
+    Route::post('/meetings/update', [MeetingController::class, 'update']); // Update a meeting
+    Route::post('/meetings/delete', [MeetingController::class, 'destroy']); // Delete a meeting
 
 });
 
