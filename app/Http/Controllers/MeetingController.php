@@ -28,13 +28,13 @@ class MeetingController extends Controller
             });
     
             return response()->json([
-                'code' => 200,
+                'status' => 200,
                 'message' => 'Meeting data fetch successful',
                 'data' => $meetings
             ], Response::HTTP_OK);
         } catch (Exception $e) {
             return response()->json([
-                'code' => 500,
+                'status' => 500,
                 'message' => 'Meeting data fetch error',
                 'data' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -65,9 +65,9 @@ class MeetingController extends Controller
 
             $meeting = Meeting::create($request->all());
 
-            return response()->json(['code'=>200, 'message' => 'Meeting created successfully', 'data' => $meeting], Response::HTTP_CREATED);
+            return response()->json(['status'=>200, 'message' => 'Meeting created successfully', 'data' => $meeting], Response::HTTP_CREATED);
         } catch (Exception $e) {
-            return response()->json(['code'=>500, 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['status'=>500, 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -87,9 +87,9 @@ class MeetingController extends Controller
 
             $meeting = Meeting::with('lead')->find($request->id);
 
-            return response()->json(['code'=>200,'message' => 'Meeting fetch successfully', 'data' => $meeting], Response::HTTP_OK);
+            return response()->json(['status'=>200,'message' => 'Meeting fetch successfully', 'data' => $meeting], Response::HTTP_OK);
         } catch (Exception $e) {
-            return response()->json(['code'=>500,'message' => 'Meeting fetch successfully', 'data' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['status'=>500,'message' => 'Meeting fetch successfully', 'data' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

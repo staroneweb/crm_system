@@ -262,4 +262,36 @@ class LeadController extends Controller
             return response()->json(['status' => 500, 'message' => 'Error deleting lead', 'error' => $e->getMessage()]);
         }
     }
+
+    public function accountNameList(Request $request)
+    {
+        try
+        {
+            $account_name_list=Lead::all();
+
+            if ($account_name_list->isEmpty()) {
+                return response()->json(['status' =>200,'message' => 'Data Not Found!']);
+            }
+
+            $data =[];
+ 
+            foreach($account_name_list as $a_l){
+
+                $data[]=[
+
+                    'id'=>$a_l->id,
+                    'name'=>$a_l->name ?? null
+
+                ];
+
+            }
+
+            return response()->json(['status'=>200,'data'=>$data]);
+
+        }catch(\Exception $e){
+ 
+            return response()->json(['status' => 500, 'message' => 'An error occurred while contact name list. Please try again later.']);
+            
+        }
+    }
 }
